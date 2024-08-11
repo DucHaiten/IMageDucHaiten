@@ -34,6 +34,17 @@ Whether you're an AI researcher, data engineer, or someone who enjoys working wi
 - **Photo Fantasy**: Create artistic effects on images, useful for data augmentation or enhancing creative content.
 - **Shuffle Image**: Shuffle or sequence images to create a diverse dataset, suitable for analysis and modeling tasks.
 
+![Screenshot_1.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/Lfy93t29PfhazAAm9PzEi.png)
+![Screenshot_2.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/-YdFtf3_-hCsjykh7XkDX.png)
+![Screenshot_3.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/BLqDam81vkPpvWTKs9d42.png)
+![Screenshot_4.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/cdhsBMhFMYzuEtNj2z4Tw.png)
+![Screenshot_5.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/vtUoLEHhR5k5SIWwxEQDt.png)
+![Screenshot_6.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/MEl_THxy-7IVjvLOtUa8P.png)
+![Screenshot_7.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/ztbJOamnGoXVi49bJ0hqR.png)
+![Screenshot_8.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/qw3osuCswU_8UaLqrshHY.png)
+![Screenshot_9.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/fI-8nFHyWx3uGlss2bnpC.png)
+![Screenshot_10.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/3L644SpuP6lFj821PoViM.png)
+
 ## Installation
 
 To install and set up **IMageDucHaiten**, you have three options:
