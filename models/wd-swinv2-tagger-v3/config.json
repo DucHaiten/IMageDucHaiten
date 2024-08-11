@@ -1,0 +1,37 @@
+{
+  "architecture": "swinv2_base_window8_256",
+  "num_classes": 10861,
+  "num_features": 1024,
+  "global_pool": "avg",
+  "model_args": {
+    "act_layer": "gelu_tanh",
+    "img_size": 448,
+    "window_size": 14
+  },
+  "pretrained_cfg": {
+    "custom_load": false,
+    "input_size": [
+      3,
+      448,
+      448
+    ],
+    "fixed_input_size": false,
+    "interpolation": "bicubic",
+    "crop_pct": 1.0,
+    "crop_mode": "center",
+    "mean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "std": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "num_classes": 10861,
+    "pool_size": null,
+    "first_conv": null,
+    "classifier": null
+  }
+}
