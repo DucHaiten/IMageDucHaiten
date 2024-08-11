@@ -1,0 +1,13 @@
+{
+  "prompt": "Write a concise, accurate, blunt, and detailed description. Focus on important points instead of writing too long. INCLUDE genre and style of the artwork if not photorealistic, State the ethnicity or race of any person. State what the photo was taken or drawn with. AVOID euphemisms, vague wording. Keep the caption length under 150 words!",
+  "max_new_tokens": 250,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": null,
+  "precision": 1,
+  "thread_count": 4,
+  "batch_size": 1,
+  "prepend_text": "",
+  "append_text": "",
+  "caption_handling": "overwrite"
+}

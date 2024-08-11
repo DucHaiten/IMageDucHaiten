@@ -1,0 +1,6 @@
+{
+  "model": "swinv2",
+  "general_threshold": 0.6,
+  "character_threshold": 0.35,
+  "model_dir": "D:/test/models/wd-swinv2-tagger-v3"
+}
