@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from PIL import Image as PILImage, ImageTk
@@ -64,13 +65,57 @@ def load_model():
     global model, tokenizer
     if model is None:
         tokenizer = LlamaTokenizer.from_pretrained('lmsys/vicuna-7b-v1.5')
-        dtype = torch.float16 if precision_var.get() <= 1 else torch.float32
-        model = AutoModelForCausalLM.from_pretrained(
-            'THUDM/cogvlm-chat-hf',
-            torch_dtype=dtype,
-            low_cpu_mem_usage=True,
-            trust_remote_code=True,
-        ).to('cuda').eval()
+
+        bit_precision = bit_precision_var.get()
+        
+        load_in_4bit = load_in_8bit = False
+
+        # Thiết lập torch_type dựa trên giá trị bit_precision
+        if bit_precision == 4:
+            load_in_4bit = True
+            torch_type = torch.float16  # Dùng float16 khi sử dụng bitsandbytes
+        elif bit_precision == 8:
+            load_in_8bit = True
+            torch_type = torch.float16  # Dùng float16 khi sử dụng bitsandbytes
+        elif bit_precision == 16:
+            torch_type = torch.float16
+        elif bit_precision == 32:
+            torch_type = torch.float32
+
+        try:
+            import bitsandbytes as bnb
+            model = AutoModelForCausalLM.from_pretrained(
+                'THUDM/cogvlm-chat-hf',
+                torch_dtype=torch_type,
+                low_cpu_mem_usage=True,
+                load_in_4bit=load_in_4bit,
+                load_in_8bit=load_in_8bit,
+                trust_remote_code=True,
+            )
+        except ImportError:
+            # Nếu không có bitsandbytes hoặc dùng 16-bit hoặc 32-bit
+            model = AutoModelForCausalLM.from_pretrained(
+                'THUDM/cogvlm-chat-hf',
+                torch_dtype=torch_type,
+                low_cpu_mem_usage=True,
+                trust_remote_code=True,
+            )
+
+        # Chỉ chuyển mô hình sang GPU nếu không sử dụng chế độ 4-bit hoặc 8-bit
+        if not load_in_4bit and not load_in_8bit:
+            model = model.to(torch.device('cuda'))
+
+            # Đảm bảo chuyển đổi mô hình sang float32 nếu đang ở chế độ 32-bit
+            if bit_precision == 32:
+                model = model.to(torch.float32)
+            elif bit_precision == 16:
+                model = model.to(torch.float16)
+        
+        model.eval()
+
+        # Kiểm tra thông tin model nạp vào
+        print(f"Model loaded with dtype: {torch_type}, 4bit: {load_in_4bit}, 8bit: {load_in_8bit}")
+
 
 def update_and_save_config():
     top_p_value = top_p_var.get() if do_sample_var.get() else None
@@ -80,12 +125,12 @@ def update_and_save_config():
         'temperature': temperature_var.get(),
         'top_k': top_k_var.get(),
         'top_p': float(top_p_value) if top_p_value is not None else None,
-        'precision': precision_var.get(),
+        'bit_precision': bit_precision_var.get(),  # Hợp nhất cả precision và bit
         'thread_count': thread_count_var.get(),
         'batch_size': batch_size_var.get(),
         'prepend_text': prepend_text_var.get(),
         'append_text': append_text_var.get(),
-        'caption_handling': caption_handling_var.get()  # Save the selected caption handling option
+        'caption_handling': caption_handling_var.get()
     }
 
     try:
@@ -95,7 +140,6 @@ def update_and_save_config():
         print(f"Error saving config to captions.json: {e}")
 
 def load_config_from_json():
-    global prompt_entry
     try:
         if os.path.exists('captions.json'):
             with open('captions.json', 'r') as f:
@@ -104,14 +148,13 @@ def load_config_from_json():
                 max_new_tokens_var.set(config_entry.get('max_new_tokens', 200))
                 temperature_var.set(config_entry.get('temperature', 1.0))
                 top_k_var.set(config_entry.get('top_k', 50))
-                top_p_value = config_entry.get('top_p', 0.95)
-                top_p_var.set(top_p_value if top_p_value is not None else 0.95)
-                precision_var.set(config_entry.get('precision', 1))
+                top_p_var.set(config_entry.get('top_p', 0.95))
+                bit_precision_var.set(config_entry.get('bit_precision', 8))  # Tải bit_precision
                 thread_count_var.set(config_entry.get('thread_count', 4))
                 batch_size_var.set(config_entry.get('batch_size', 1))
                 prepend_text_var.set(config_entry.get('prepend_text', ''))
                 append_text_var.set(config_entry.get('append_text', ''))
-                caption_handling_var.set(config_entry.get('caption_handling', 'skip'))  # Load the saved caption handling option
+                caption_handling_var.set(config_entry.get('caption_handling', 'skip'))
 
                 prompt_entry.delete("1.0", tk.END)
                 prompt_entry.insert(tk.END, config_entry.get('prompt', ''))
@@ -199,16 +242,39 @@ def toggle_sampling_options():
     center_window(root)
 
 def open_image_to_caption():
+    global bit_precision_var, root
+    global initial_bit_precision
+    global app_initialized
     global stop_processing, error_messages, selected_files, save_directory, status_var, num_files_var, errors_var, progress
     global prompt_var, max_new_tokens_var, do_sample_var, temperature_var, top_k_var, top_p_var, thread_count_var, precision_var, batch_size_var
-    global prepend_text_var, append_text_var, search_var, action_var, caption_handling_var  # Updated caption handling variable
+    global prepend_text_var, append_text_var, search_var, action_var, caption_handling_var
     global start_button, stop_button
     global temperature_label, temperature_entry, top_k_label, top_k_entry, top_p_label, top_p_entry
     global do_sample_check, prompt_entry, select_files_button, show_captions_button, thread_count_entry, precision_entry, batch_size_entry
     global prepend_text_entry, append_text_entry
-    global root
     global q
 
+    app_initialized = False
+
+    # Định nghĩa hàm xử lý khi bit_precision thay đổi
+    def on_bit_precision_change(*args):
+        if not app_initialized:
+            return
+        
+        update_and_save_config()
+
+        result = messagebox.showinfo(
+            "Bit Precision Changed",
+            "You have changed the bit precision. Please restart the app for the changes to take effect."
+        )
+            
+        if result == "ok":
+            root.destroy()  # Tắt ứng dụng hiện tại
+            python = sys.executable
+            os.execl(python, python, "main.py")
+            
+
+    # Initialize the main Tkinter root window
     root = tk.Tk()
     root.title("Image to Caption")
     root.geometry("1050x950")
@@ -233,6 +299,9 @@ def open_image_to_caption():
     search_var = tk.StringVar()  # Biến search_var khởi tạo ở đây
     action_var = tk.StringVar()  # Biến action_var khởi tạo ở đây
 
+    bit_precision_var = tk.IntVar(value=8)
+    initial_bit_precision = bit_precision_var.get()
+
     q = queue.Queue()
 
     validate_cmd = root.register(validate_numeric_input)
@@ -243,8 +312,8 @@ def open_image_to_caption():
     title_label = tk.Label(root, text="Image Caption Generator", font=('Helvetica', 16))
     title_label.pack(pady=10)
 
-    warning_label = tk.Label(root, text="NOTE: To run CogVLM with the minimum configuration, you need at least 40GB RAM to load the model in FP16 with batch size 1 and a GPU with at least 24GB of VRAM. It is recommended to install ImageDucHaiten on an NVMe SSD to optimize speed.",
-                             font=('Helvetica', 10), fg="red", wraplength=750, justify="left")
+    warning_label = tk.Label(root, text="NOTE: 4-bit requires 20GB of RAM and 12GB of VRAM, 8-bit requires 20GB of RAM and 16GB of VRAM, 16-bit requires 50GB of RAM and 24GB of VRAM, 32-bit requires 85GB of RAM and 40GB of VRAM. Although GPUs with less VRAM can still run, the performance will be very slow.",
+                             font=('Helvetica', 10), fg="red", wraplength=850, justify="left")
     warning_label.pack(pady=10)
 
     select_files_button = tk.Button(root, text="Select Files", command=select_files)
@@ -255,6 +324,17 @@ def open_image_to_caption():
 
     num_files_label = tk.Label(root, textvariable=num_files_var)
     num_files_label.pack(pady=5)
+
+    bit_frame = tk.Frame(root)
+    bit_frame.pack(pady=5)
+
+    bit_label = tk.Label(bit_frame, text="Select Bit Precision:")
+    bit_label.pack(side="left", padx=10)
+
+    tk.Radiobutton(bit_frame, text="4-bit", variable=bit_precision_var, value=4).pack(side="left", padx=5)
+    tk.Radiobutton(bit_frame, text="8-bit", variable=bit_precision_var, value=8).pack(side="left", padx=5)
+    tk.Radiobutton(bit_frame, text="16-bit", variable=bit_precision_var, value=16).pack(side="left", padx=5)
+    tk.Radiobutton(bit_frame, text="32-bit", variable=bit_precision_var, value=32).pack(side="left", padx=5)
 
     prompt_label = tk.Label(root, text="Prompt (text to describe the image):")
     prompt_label.pack(pady=5)
@@ -290,7 +370,11 @@ def open_image_to_caption():
     skip_radio = tk.Radiobutton(options_frame, text="Skip images with existing caption", variable=caption_handling_var, value='skip')
     skip_radio.pack(side="left", padx=10)
 
+    bit_precision_var.trace('w', on_bit_precision_change)
+
     load_config_from_json()
+
+    app_initialized = True
 
     prompt_var.trace('w', on_config_change)
     max_new_tokens_var.trace('w', on_config_change)
@@ -423,12 +507,20 @@ def generate_caption(image_path, save_directory, q):
             history=[],
             images=[image]
         )
+
+        # Điều chỉnh dtype dựa trên bit_precision
+        if bit_precision_var.get() == 32:
+            image_tensor = inputs['images'][0].to('cuda').to(torch.float32)
+        else:
+            image_tensor = inputs['images'][0].to('cuda').to(torch.float16)
+
         inputs = {
             'input_ids': inputs['input_ids'].unsqueeze(0).to('cuda'),
             'token_type_ids': inputs['token_type_ids'].unsqueeze(0).to('cuda'),
             'attention_mask': inputs['attention_mask'].unsqueeze(0).to('cuda'),
-            'images': [[inputs['images'][0].to('cuda').to(torch.float16)]],
+            'images': [[image_tensor]],
         }
+
         gen_kwargs = {
             "max_new_tokens": max_new_tokens_var.get(),
             "do_sample": do_sample_var.get(),
@@ -461,6 +553,7 @@ def generate_caption(image_path, save_directory, q):
         print(error_message)
         q.put(error_message)
         error_messages.append(error_message)
+
 
 def worker(save_directory, num_threads, batch_size):
     try:
@@ -562,7 +655,7 @@ def open_caption_window():
 
     caption_window = tk.Toplevel(root)
     caption_window.title("Image Thumbnails and Captions")
-    caption_window.geometry("800x900")
+    caption_window.geometry("940x900")
 
     main_frame = tk.Frame(caption_window)
     main_frame.pack(fill=tk.BOTH, expand=True)
@@ -613,6 +706,16 @@ def open_caption_window():
     caption_frame.bind("<Configure>", lambda e: content_canvas.configure(scrollregion=content_canvas.bbox("all")))
     content_canvas.bind_all("<MouseWheel>", lambda event: content_canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
+    # Định nghĩa hàm on_mouse_wheel
+    def on_mouse_wheel(event):
+        try:
+            if content_canvas.winfo_exists():
+                content_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        except tk.TclError:
+            pass
+
+    content_canvas.bind_all("<MouseWheel>", on_mouse_wheel)
+
     def on_caption_window_close():
         global caption_window
         caption_window.destroy()
@@ -652,7 +755,7 @@ def update_image_preview(content_canvas):
             img_label = tk.Label(caption_frame, image=thumbnail)
             img_label.grid(row=i*2, column=0, padx=5, pady=5, sticky="nsew")
 
-            file_label = tk.Label(caption_frame, text=os.path.basename(file_path), font=('Helvetica', 12))
+            file_label = tk.Label(caption_frame, text=os.path.basename(file_path), font=('Helvetica', 12), wraplength=300, justify="left")
             file_label.grid(row=i*2, column=1, padx=5, pady=5, sticky="nsew")
 
             caption_file = os.path.join(save_directory, f"{os.path.basename(file_path)}_caption.txt")
