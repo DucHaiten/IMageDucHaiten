@@ -78,7 +78,7 @@ To install and set up **IMageDucHaiten**, you have three options:
 
 1. **Download the Full Package**:
    - Download the full package from the following link:
-     [IMageDucHaiten_v1.1.1-Full.zip](https://huggingface.co/DucHaiten/IMageDucHaiten-Full/tree/main)
+     [IMageDucHaiten-Full.zip](https://huggingface.co/DucHaiten/IMageDucHaiten-Full/tree/main)
 
 2. **Extract the Package**:
    - Extract the contents of the `.zip` file to your desired location.
@@ -101,7 +101,7 @@ To install and set up **IMageDucHaiten**, you have three options:
 
 5. **Run the Application**:
    - After activating the virtual environment, you can start the application by running:
-     ```bash
+     ```bashF
      python main.py
      ```
 
