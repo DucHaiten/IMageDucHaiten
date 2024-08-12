@@ -1,9 +1,21 @@
+---
+license: apache-2.0
+language:
+- en
+tags:
+- image-processing
+- deep-learning
+- AI
+---
+---
+
 # IMageDucHaiten
 
-**Version:** `V1.1.1`
+**Version:** `V1.1.2`
 
 ## Table of Contents
 
+- [Recent Updates](#recent-updates)
 - [Introduction](#introduction)
 - [Key Features](#key-features)
 - [Installation](#installation)
@@ -17,9 +29,23 @@
 - [Community and Support](#community-and-support)
 - [Support and Contributions](#support-and-contributions)
 
+## Recent Updates
+
+### Version V1.1.2
+
+Version `V1.1.2` introduces significant optimizations and new features, especially in the **Image To Caption** module. The key enhancements include:
+
+- **Added Bit Precision Options**: Users can now select between different bit precision levels when processing images:
+  - **4-bit**: Requires at least 20GB RAM and 12GB VRAM.
+  - **8-bit**: Requires at least 20GB RAM and 16GB VRAM.
+  - **16-bit**: Requires at least 50GB RAM and 24GB VRAM.
+  - **32-bit**: Although the previous version required 40GB VRAM for 32-bit float32, this update optimizes it to run even with 24GB VRAM, though at significantly reduced speeds. This lower VRAM option is not recommended for performance-critical tasks.
+
+> **NOTE**: Although optimization has been made to allow GPUs with lower VRAM to run at higher bit precision, the speed will be significantly reduced.
+
 ## Introduction
 
-**IMageDucHaiten** is a powerful tool specifically designed for AI professionals to assist in the preparation of image data for training generative AI models. Version `V1.1.1` offers a suite of automated and flexible tools for processing, tagging, and captioning images, making the data preparation process more efficient and streamlined.
+**IMageDucHaiten** is a powerful tool specifically designed for AI professionals to assist in the preparation of image data for training generative AI models. Version `V1.1.2` offers a suite of automated and flexible tools for processing, tagging, and captioning images, making the data preparation process more efficient and streamlined.
 
 Whether you're an AI researcher, data engineer, or someone who enjoys working with images, **IMageDucHaiten** can be an invaluable tool. It not only excels in supporting AI data preparation but is also accessible and beneficial to anyone looking to work with images effortlessly and effectively.
 
@@ -32,7 +58,6 @@ Whether you're an AI researcher, data engineer, or someone who enjoys working wi
 - **Image To Tag**: Automatically tag images, optimizing the data labeling process for AI models.
 - **Image To Caption**: Automatically generate captions, providing context to images, useful in image recognition and captioning tasks.
 - **Photo Fantasy**: Create artistic effects on images, useful for data augmentation or enhancing creative content.
-- **Shuffle Image**: Shuffle or sequence images to create a diverse dataset, suitable for analysis and modeling tasks.
 
 ![Screenshot_1.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/Lfy93t29PfhazAAm9PzEi.png)
 ![Screenshot_2.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/-YdFtf3_-hCsjykh7XkDX.png)
@@ -41,7 +66,7 @@ Whether you're an AI researcher, data engineer, or someone who enjoys working wi
 ![Screenshot_5.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/vtUoLEHhR5k5SIWwxEQDt.png)
 ![Screenshot_6.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/MEl_THxy-7IVjvLOtUa8P.png)
 ![Screenshot_7.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/ztbJOamnGoXVi49bJ0hqR.png)
-![Screenshot_8.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/qw3osuCswU_8UaLqrshHY.png)
+![image.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/6xkI8bdr6Py4pgO3UC0vh.png)
 ![Screenshot_9.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/fI-8nFHyWx3uGlss2bnpC.png)
 ![Screenshot_10.png](https://cdn-uploads.huggingface.co/production/uploads/630b58b279d18d5e53e3a5a9/3L644SpuP6lFj821PoViM.png)
 
@@ -53,7 +78,7 @@ To install and set up **IMageDucHaiten**, you have three options:
 
 1. **Download the Full Package**:
    - Download the full package from the following link:
-     [IMageDucHaiten_v1.1.1-Full.zip](https://huggingface.co/DucHaiten/IMageDucHaiten-Full/resolve/main/IMageDucHaiten_v1.1.1-Full.zip)
+     [IMageDucHaiten_v1.1.1-Full.zip](https://huggingface.co/DucHaiten/IMageDucHaiten-Full/tree/main)
 
 2. **Extract the Package**:
    - Extract the contents of the `.zip` file to your desired location.
