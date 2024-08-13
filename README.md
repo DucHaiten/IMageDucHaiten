@@ -108,7 +108,7 @@ To install and set up **IMageDucHaiten**, you have three options:
 ### Option 2: Full Package Installation via Git Clone
 
 1. **Install Git and Git LFS**:
-   - Ensure Git is installed on your system. If not, download and install it from [Git's official site](https://git-scm.com/downloads).
+   - Ensure Git is installed on your system. If not, download and install it from [Git's official site](https://git-scm.com/downloads) and [Git lfs](https://git-lfs.com/)
    - Install Git LFS (Large File Storage) by running:
      ```bash
      git lfs install
