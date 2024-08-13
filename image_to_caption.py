@@ -481,8 +481,8 @@ def generate_caption(image_path, save_directory, q):
     try:
         load_model()
 
-        filename = os.path.basename(image_path)
-        caption_file_path = os.path.join(save_directory, f"{filename}_caption.txt")
+        filename = os.path.splitext(os.path.basename(image_path))[0]
+        caption_file_path = os.path.join(save_directory, f"{filename}.txt")
 
         # Kiểm tra các lựa chọn của người dùng
         if os.path.exists(caption_file_path):
