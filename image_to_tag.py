@@ -164,8 +164,8 @@ def open_image_to_tag():
             return
 
         try:
-            filename = os.path.basename(image_path)
-            output_path = os.path.join(save_directory, f"{filename}_tags.txt")
+            filename = os.path.splitext(os.path.basename(image_path))[0]
+            output_path = os.path.join(save_directory, f"{filename}.txt")
 
             command = [
                 sys.executable, 'D:/test/wdv3-timm-main/wdv3_timm.py',
@@ -428,7 +428,7 @@ def open_image_to_tag():
                 img_label.grid(row=i*2, column=0, padx=5, pady=5, sticky="nsew")
 
                 # Display file name
-                file_label = tk.Label(caption_frame, text=os.path.basename(file_path), font=('Helvetica', 12))
+                file_label = tk.Label(caption_frame, text=os.path.basename(file_path), font=('Helvetica', 12), wraplength=300, justify="left")
                 file_label.grid(row=i*2, column=1, padx=5, pady=5, sticky="nsew")
 
                 # Check and display caption if available
